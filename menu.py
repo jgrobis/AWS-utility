@@ -1,5 +1,5 @@
 from re import S
-import tkinter, boto3, os
+import tkinter, boto3, os, os.path
 from tkinter import Tk, Label, Button
 from dotenv import load_dotenv
 from pathlib import Path
@@ -7,15 +7,17 @@ from pathlib import Path
 # Create the default window
 root = tkinter.Tk()
 root.title("SMS Sender")
-root.geometry('700x500')
+root.geometry('900x500')
+button_env_color="gray"
 
-load_dotenv()
+#checkenv function!
+def env_button():
+    if os.path.isfile('.env'):
+        print("You are good with .env :) \n")
+    else:
+        os.system('python get-env.py')
+        print("You need to add .env file first! \n Restart main program after adding! \n")
 
-access_key = os.getenv('access_key_env')
-secret = os.getenv('secret_env')
-region = os.getenv('region_env')
-
-print(access_key, secret)
 #Sender function
 def click_action():
     load_dotenv()
@@ -25,9 +27,7 @@ def click_action():
     region = os.getenv('region_env')
 
     number = '+48'+numberbox.get(1.0, "end-1c")
-
     sms_message = sms_messagebox.get(1.0, "end-1c")
-
     sender_id = sender_idbox.get(1.0, "end-1c")
 
     sns = boto3.client('sns', aws_access_key_id=access_key, aws_secret_access_key=secret, region_name=region)
@@ -36,11 +36,11 @@ def click_action():
     label4 = Label(root, text="Wiadomość wysłana!", font=('helvetica', 10))
     root.create_window(200, 210, window=label3)
 
-#Wiadomosc na gorze sotrny
+#Program start
 label = Label(root, text="Uzupełnij pola by wysłać wiadomość", font=('helvetica', 22), fg="Black")
 label.pack()
 
-#Boxy
+#Box
 label1 = Label(root, text="Wprowadź numer telefonu bez przedrostka +48", font=('helvetica', 10), fg="Black")
 label1.pack()
 numberbox = tkinter.Text(root,
@@ -65,11 +65,14 @@ sender_idbox = tkinter.Text(root,
   
 sender_idbox.pack()
 
-#Przycisk do wysłania
+#.env file button
+env_button = Button(root, text="Check .env", font=('helvetica', 8), fg="Black", command=env_button)
+env_button.place(x=5, y=5)
+
+#Sending button
 click_button = Button(root, text="Wyślij SMS", width=8, command=click_action)
 click_button.pack()
 
-#Jakes cos XD
 lbl = tkinter.Label(root, text = "")
 lbl.pack()
 root.mainloop()
